@@ -1,24 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import "bootstrap/dist/css/bootstrap.css";
+import Registration from "./components/Registration";
+import Login from "./components/Login";
+import { Route, Routes } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./components/Home";
+import Dashboard from "./components/Dashboard";
+import EnrollStudent from "./components/students/EnrollStudent";
+import HireTeacher from "./components/teachers/HireTeacher";
+import AddSubject from "./components/subjects/AddSubject";
+import StudentList from "./components/students/StudentList";
+import NoPage from "./components/NoPage";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<Registration />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/enroll_student" element={<EnrollStudent />} />
+        <Route path="/hire_teacher" element={<HireTeacher />} />
+        <Route path="/add_subject" element={<AddSubject />} />
+        <Route path="/students" element={<StudentList />} />
+        <Route path="*" element={<NoPage />} />
+      </Routes>
+    </>
   );
 }
 
