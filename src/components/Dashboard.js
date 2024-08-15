@@ -1,15 +1,14 @@
-import React, { useContext, useState } from "react";
-import Login from "./Login";
-import { NavLink } from "react-router-dom";
+import React, { useContext } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 
 const Dashboard = () => {
   // hooks
-  const { auth_token } = useContext(AuthContext);
-  // const auth_token = localStorage.getItem("auth_token");
-  console.log("Auth Token from Context:", auth_token);
+  // const { auth_token } = useContext(AuthContext);
+  const auth_token = localStorage.getItem("auth_token");
+  const navigate = useNavigate();
   if (!auth_token) {
-    return <Login />;
+    navigate("/login");
   }
   return (
     <div className="container">
@@ -18,6 +17,9 @@ const Dashboard = () => {
           <h4>Students</h4>
           <NavLink to="/enroll_student" className="btn btn-primary">
             Enroll Student
+          </NavLink>
+          <NavLink to="/students" className="btn btn-primary m-3">
+            Enrolled Students
           </NavLink>
         </div>
         <div className="col">

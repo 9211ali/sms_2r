@@ -1,10 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import Login from "../Login";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
 
-const EnrollStudent = () => {
+const EditStudentProfile = () => {
   // hooks
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -13,14 +13,11 @@ const EnrollStudent = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
-  // const { auth_token, admin_id } = useContext(AuthContext);
+  const { student_id } = useParams();
 
+  // const { auth_token, admin_id } = useContext(AuthContext);
   const auth_token = localStorage.getItem("auth_token");
   const admin_id = localStorage.getItem("admin_id");
-
-  if (!admin_id) {
-    return <Login />;
-  }
 
   const validateForm = () => {
     if (!firstName || !lastName || !email || !phone) {
@@ -29,6 +26,34 @@ const EnrollStudent = () => {
     }
     return true;
   };
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:4000/students/${student_id}/edit`, {
+        headers: {
+          Authorization: `Bearer ${auth_token}`,
+        },
+      })
+      .then((response) => {
+        if (response.data.status === "found") {
+          const student = response.data.student;
+          setFirstName(student.first_name);
+          setLastName(student.last_name);
+          setEmail(student.email);
+          setPhone(student.phone);
+          console.log('Student info = ', student);
+        } else {
+          console.error("Some error occurred at the Rails backend endpoint");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching student:", error);
+      });
+  }, [student_id]);
+
+  if (!admin_id) {
+    return <Login />;
+  }
 
   const submitForm = (e) => {
     e.preventDefault();
@@ -40,8 +65,8 @@ const EnrollStudent = () => {
     }
 
     axios
-      .post(
-        "http://localhost:4000/students",
+      .put(
+        `http://localhost:4000/students/${student_id}`,
         {
           first_name: firstName,
           last_name: lastName,
@@ -56,31 +81,23 @@ const EnrollStudent = () => {
         }
       )
       .then((response) => {
-        if (response.data.status === "created") {
-          setSuccess("Enrollment successful!");
-          clearForm();
+        if (response.data.status === "ok") {
+          setSuccess("Profile updated successfully!");
           navigate("/students");
         } else {
-          setError("An error occurred during enrollment.");
+          setError("An error occurred during the update.");
         }
       })
       .catch((error) => {
-        setError("Enrollment error: " + error.message);
+        setError("Update error: " + error.message);
       });
-  };
-
-  const clearForm = () => {
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setPhone("");
   };
 
   return (
     <div className="container-fluid">
       <form onSubmit={submitForm}>
         <fieldset>
-          <legend>EnrollStudent Form</legend>
+          <legend>Edit Student Profile</legend>
           {error && <div className="alert alert-danger">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
           <div className="form-group">
@@ -99,7 +116,7 @@ const EnrollStudent = () => {
           </div>
           <div className="form-group">
             <label htmlFor="lastName">
-              Last Name <sup>*</sup>
+              Last Name<sup>*</sup>
             </label>
             <input
               className="form-control"
@@ -113,7 +130,7 @@ const EnrollStudent = () => {
           </div>
           <div className="form-group">
             <label htmlFor="email">
-              Email <sup>*</sup>
+              Email<sup>*</sup>
             </label>
             <input
               className="form-control"
@@ -127,7 +144,7 @@ const EnrollStudent = () => {
           </div>
           <div className="form-group">
             <label htmlFor="phone">
-              Phone <sup>*</sup>
+              Phone<sup>*</sup>
             </label>
             <input
               className="form-control"
@@ -140,7 +157,7 @@ const EnrollStudent = () => {
             />
           </div>
           <button type="submit" className="btn btn-primary mt-4">
-            Enroll
+            Update
           </button>
         </fieldset>
       </form>
@@ -148,5 +165,4 @@ const EnrollStudent = () => {
   );
 };
 
-export default EnrollStudent;
-
+export default EditStudentProfile;
